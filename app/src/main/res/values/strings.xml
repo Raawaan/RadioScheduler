@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Radio</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="timeFormatFrom" formatted="false">From %s:%s</string>
+    <string name="timeFormatTo" formatted="false">To %s:%s</string>
+    <string name="radioName" formatted="false"> %s</string>
+    <string name="warning_program_existed">Program Name Already Existed</string>
+    <string name="msg_program_created">Program Created</string>
+    <string name="error_name">Invalid Program Name</string>
+    <string name="select_img">Select Picture</string>
+    <string name="type_img">image/*</string>
+    <string name="error_add_program">Error While Adding Program</string>
+    <string name="activity_title">Add Program</string>
+    <string name="warning_after_to">End Time Should Be After Start</string>
+    <string name="warning_overlap">Overlap with another radio</string>
+    <string name="warning_overlap_program">Overlap with another program</string>
+    <string name="station_added">added</string>
+    <string name="choose_location">Please choose location</string>
+    <string name="add_radios">Please Add Radio</string>
+</resources>

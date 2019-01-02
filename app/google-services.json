@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "663693143280",
+    "firebase_url": "https://radio-354fb.firebaseio.com",
+    "project_id": "radio-354fb",
+    "storage_bucket": "radio-354fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663693143280:android:c7c669ae5a6233bc",
+        "android_client_info": {
+          "package_name": "com.example.rawan.radio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663693143280-82bkj0n4b5sn0kv8s21hqqg9tu427gd2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rawan.radio",
+            "certificate_hash": "d1195c4b429fd82119ba31d08cbb5565db210363"
+          }
+        },
+        {
+          "client_id": "663693143280-9no2td2hg8h92jblp7224m9hcs9ufso4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHOJSYS8-G3tNIrkObvvdsyEeCTyu7cS8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663693143280-9no2td2hg8h92jblp7224m9hcs9ufso4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

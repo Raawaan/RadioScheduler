@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+         <item
+             android:id="@+id/nav_program"
+             android:checked="true"
+             android:icon="@drawable/nav_program"
+            android:title="Programs" />
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/nav_setting"
+            android:title="Setting" />
+        <item
+            android:id="@+id/nav_share_app"
+            android:icon="@drawable/nav_share"
+            android:title="Share Application" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/nav_about"
+            android:title="About" />
+        </group>
+</menu>
