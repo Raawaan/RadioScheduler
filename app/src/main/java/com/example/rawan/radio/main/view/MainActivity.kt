@@ -25,6 +25,7 @@ import android.support.annotation.RequiresApi
 import android.widget.Toast
 import com.example.rawan.radio.*
 import com.example.rawan.radio.StartService
+import com.example.rawan.radio.audioPlayer.MediaService
 import com.example.rawan.radio.main.model.MainModel
 import com.example.rawan.radio.main.presenter.MainPresenter
 import com.example.rawan.radio.radioDatabase.RadioDatabase
@@ -62,12 +63,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
         time.setToNow()
         val c = Calendar.getInstance()
-
         mainPresenter= MainPresenter(this, MainModel(RadioDatabase.getInstance(this)))
         mainPresenter.selectNextRadio((time.hour*60000*60+time.minute*60000-6000).toLong(),
                 c.get(Calendar.DAY_OF_WEEK))
-
-
     }
 
     override fun onBackPressed() {
@@ -132,7 +130,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 replaceFragments(AboutFragment.newInstance())
             }
         }
-
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
@@ -149,7 +146,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         bundle.putLong("stopService",abs(nextRadio.toHour
                 .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
         val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        startRadioPlayService(bundle, nextRadio, jobScheduler)
+        if(!MediaService().isInstanceCreated()){
+            startRadioPlayService(bundle, nextRadio, jobScheduler)
+        }
     }
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
         val componentName = ComponentName(applicationContext, StartService::class.java)

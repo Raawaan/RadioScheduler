@@ -99,8 +99,10 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
     }
     private fun viewModelObservable(listOfPrograms: List<ProgramAndRadioProgram>?) {
         if (listOfPrograms?.isNotEmpty() == true) {
-            tVEmptyList.visibility = View.GONE
-            RVProgramsList.visibility = View.VISIBLE
+            if(tVEmptyList.visibility!=null){
+                tVEmptyList.visibility = View.GONE
+                RVProgramsList.visibility = View.VISIBLE
+            }
             programsListAdapter = ProgramsListAdapter(listOfPrograms, this.context, clickListener = {
                 val intent = Intent(context, ListOfProgramsRadiosActivity::class.java)
                 intent.putExtra("programName", it.programName)
