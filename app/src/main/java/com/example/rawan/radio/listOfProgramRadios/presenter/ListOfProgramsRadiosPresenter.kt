@@ -43,7 +43,7 @@ class ListOfProgramsRadiosPresenter(private val listOfProgramsRadiosModel: ListO
                         onNext = {fromToDaysList->
                             var flag = true
                             fromToDaysList.map {
-                                if (!it.fromHour.equals(fromHour)) {
+                                if (!it.fromHour.equals(fromHourExisted)) {
                                     if((fromHour in it.fromHour..it.toHour) ||
                                         (toHour in it.fromHour..it.toHour) ||
                                         it.fromHour in fromHour..toHour ||
@@ -54,6 +54,7 @@ class ListOfProgramsRadiosPresenter(private val listOfProgramsRadiosModel: ListO
                                 }
                             }
                             if (flag){
+                                listOfProgramsRadiosView.dismiss()
                                 updateRadio(fromHour,toHour,programId,radioId,fromHourExisted)
                             }
                         },

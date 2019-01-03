@@ -20,6 +20,7 @@ import com.example.rawan.radio.R
 import com.example.rawan.radio.editProgram.view.EditProgramActivity
 import com.example.rawan.radio.home.model.HomeViewModel
 import com.example.rawan.radio.home.model.HomeModel
+import com.example.rawan.radio.home.model.ProgramAndRadioProgram
 import com.example.rawan.radio.home.model.ProgramsListAdapter
 import com.example.rawan.radio.home.presenter.RequestAPIPresenter
 import com.example.rawan.radio.main.view.FragmentClickListener
@@ -31,6 +32,7 @@ import com.example.rawan.radio.main.view.MainActivity
 
 
 class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
+
     private lateinit var requestAPIPresenter: RequestAPIPresenter
     private lateinit var mLifecycleRegistry: LifecycleRegistry
     private lateinit var viewModel: HomeViewModel
@@ -40,61 +42,6 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
             return HomeFragment()
         }
     }
-
-    override fun toAlphabetical() {
-        viewModel.selectProgramAndRadioProgramByName().observe(this, Observer {listOfPrograms->
-            if(listOfPrograms?.isNotEmpty()==true){
-                tVEmptyList.visibility=View.GONE
-                RVProgramsList.visibility=View.VISIBLE
-                programsListAdapter=ProgramsListAdapter(listOfPrograms,this.context,clickListener = {
-                    val intent =Intent(context, ListOfProgramsRadiosActivity::class.java)
-                    intent.putExtra("programName",it.programName)
-                    startActivity(intent)
-                    true
-                },
-                        clickListenerEditImageView = {
-                            val intent =Intent(context, EditProgramActivity::class.java)
-                            intent.putExtra("programName",it.programName)
-                            startActivity(intent)
-                            true
-                        })
-                RVProgramsList.adapter = programsListAdapter
-            }
-            else{
-                tVEmptyList?.visibility=View.VISIBLE
-                RVProgramsList.visibility=View.GONE
-            }
-        })
-    }
-
-    override fun toFavorite() {
-        viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
-            if(listOfPrograms?.isNotEmpty()==true){
-                tVEmptyList.visibility=View.GONE
-                RVProgramsList.visibility=View.VISIBLE
-                programsListAdapter=ProgramsListAdapter(listOfPrograms,this.context,clickListener = {
-                    val intent =Intent(context, ListOfProgramsRadiosActivity::class.java)
-                    intent.putExtra("programName",it.programName)
-                    startActivity(intent)
-                    true
-                },
-                        clickListenerEditImageView = {
-                            val intent =Intent(context, EditProgramActivity::class.java)
-                            intent.putExtra("programName",it.programName)
-                            startActivity(intent)
-                            true
-                        })
-                RVProgramsList.adapter = programsListAdapter
-            }
-            else{
-                tVEmptyList?.visibility=View.VISIBLE
-                RVProgramsList.visibility=View.GONE
-            }
-        })
-
-    }
-
-
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         (activity as MainActivity).setOnClickListener(this)
@@ -104,7 +51,6 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
         super.onViewCreated(view, savedInstanceState)
         requestAPIPresenter= RequestAPIPresenter(HomeModel(RadioDatabase.getInstance(this.context)),this)
     }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
@@ -113,28 +59,8 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         RVProgramsList.layoutManager = LinearLayoutManager(this.context)
         viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
-            if(listOfPrograms?.isNotEmpty()==true){
-            tVEmptyList.visibility=View.GONE
-             RVProgramsList.visibility=View.VISIBLE
-             programsListAdapter=ProgramsListAdapter(listOfPrograms,this.context,clickListener = {
-                 val intent =Intent(context, ListOfProgramsRadiosActivity::class.java)
-                 intent.putExtra("programName",it.programName)
-                 startActivity(intent)
-                 true
-             },
-                     clickListenerEditImageView = {
-                         val intent =Intent(context, EditProgramActivity::class.java)
-                         intent.putExtra("programName",it.programName)
-                         startActivity(intent)
-                         true
-                     })
-                RVProgramsList.adapter = programsListAdapter
-            }
-            else{
-                tVEmptyList?.visibility=View.VISIBLE
-                RVProgramsList.visibility=View.GONE
-            }
-            })
+            viewModelObservable(listOfPrograms)
+        })
         val swipeHandler =  object :ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT){
             override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
                 return false
@@ -161,5 +87,36 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
     override fun toast(msg: String) {
         Toast.makeText(context,msg,Toast.LENGTH_LONG).show()
     }
-
+    override fun toAlphabetical() {
+        viewModel.selectProgramAndRadioProgramByName().observe(this, Observer {listOfPrograms->
+            viewModelObservable(listOfPrograms)
+        })
+    }
+    override fun toFavorite() {
+        viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
+            viewModelObservable(listOfPrograms)
+        })
+    }
+    private fun viewModelObservable(listOfPrograms: List<ProgramAndRadioProgram>?) {
+        if (listOfPrograms?.isNotEmpty() == true) {
+            tVEmptyList.visibility = View.GONE
+            RVProgramsList.visibility = View.VISIBLE
+            programsListAdapter = ProgramsListAdapter(listOfPrograms, this.context, clickListener = {
+                val intent = Intent(context, ListOfProgramsRadiosActivity::class.java)
+                intent.putExtra("programName", it.programName)
+                startActivity(intent)
+                true
+            },
+                    clickListenerEditImageView = {
+                        val intent = Intent(context, EditProgramActivity::class.java)
+                        intent.putExtra("programName", it.programName)
+                        startActivity(intent)
+                        true
+                    })
+            RVProgramsList.adapter = programsListAdapter
+        } else {
+            tVEmptyList?.visibility = View.VISIBLE
+            RVProgramsList.visibility = View.GONE
+        }
+    }
 }

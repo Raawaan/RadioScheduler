@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageChosenEditProgram"
-        app:text_color="@color/colorPrimary" />
+        app:text_color="@color/lightGray" />
 
     <LinearLayout
         android:id="@+id/linearLayout"

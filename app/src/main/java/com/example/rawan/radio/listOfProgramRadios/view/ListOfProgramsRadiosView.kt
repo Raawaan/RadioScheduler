@@ -8,4 +8,5 @@ import com.example.rawan.radio.searchForRadio.model.RadioProgramFromTo
  */
 interface ListOfProgramsRadiosView {
     fun toast(msg:String)
+    fun dismiss()
 }

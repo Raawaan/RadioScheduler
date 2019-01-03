@@ -33,7 +33,8 @@ interface ProgramDaysDao{
     @Query("select fromHour,toHour,days from radioProgram,programDay where radioProgram.programId=programDay.programId and days in(:day)")
     fun selectHoursFromToAndDays(day:List<Int>):List<FromToDays>
 
- @Query("select fromHour,toHour,days from radioProgram,programDay where radioProgram.programId=programDay.programId and days in( select days from program,programDay where program.programName =:programName AND program.programId=programDay.programId)")
+    @Query("select fromHour,toHour,days from radioProgram,programDay where radioProgram.programId=programDay.programId and days in(" +
+            " select days from program,programDay where program.programName =:programName AND program.programId=programDay.programId)")
     fun selectHoursFromToAndDaysWhereName(programName:String):List<FromToDays>
 
     @Query("select days from programDay,program where " +

@@ -22,8 +22,10 @@ import kotlinx.android.synthetic.main.add_date_radio.view.*
 
 class ListOfProgramsRadiosActivity : AppCompatActivity(),ListOfProgramsRadiosView,LifecycleOwner {
 
+
     private lateinit var presenter: ListOfProgramsRadiosPresenter
     private lateinit var mLifecycleRegistry: LifecycleRegistry
+    private lateinit var  mAlertDialog :AlertDialog
     private lateinit var listOfProgramRadioViewModel: ListOfProgramRadioViewModel
     private lateinit var  listOfProgramRadioAdapter :ListOfProgramRadioAdapter
     private var programName=""
@@ -48,7 +50,7 @@ class ListOfProgramsRadiosActivity : AppCompatActivity(),ListOfProgramsRadiosVie
                  mDialogView.background = getDrawable(R.drawable.background_border)
                  val mBuilder = AlertDialog.Builder(this)
                          .setView(mDialogView)
-                 val mAlertDialog = mBuilder.show()
+                  mAlertDialog  = mBuilder.show()
                  mDialogView.btnConfirm.setOnClickListener {
                      val fromDateLong= (mDialogView.fromTimePicker.hour*60000*60).plus(mDialogView.fromTimePicker.minute*60000).toLong()
                      val toDateLong= (mDialogView.toTimePicker.hour*60000*60).plus(mDialogView.toTimePicker.minute*60000).toLong()
@@ -68,7 +70,6 @@ class ListOfProgramsRadiosActivity : AppCompatActivity(),ListOfProgramsRadiosVie
 
                      }
                          presenter.selectFromToDay(programName,fromDateLong,toDateLong,fromToRadio.programId,fromToRadio.radioId,fromToRadio.fromHour)
-                         mAlertDialog.dismiss()
                      }
 
                  }
@@ -105,6 +106,9 @@ class ListOfProgramsRadiosActivity : AppCompatActivity(),ListOfProgramsRadiosVie
         }
     override fun toast(msg: String) {
         Toast.makeText(this,msg,Toast.LENGTH_LONG).show()
+    }
+    override fun dismiss() {
+        mAlertDialog.dismiss()
     }
 }
 

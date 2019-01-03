@@ -36,10 +36,6 @@ import kotlin.math.abs
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,MainView {
 
     private var listener: FragmentClickListener? = null
-
-    fun setOnClickListener(listener: FragmentClickListener) {
-        this.listener = listener
-    }
     private val time = Time()
     lateinit var mainPresenter: MainPresenter
     @RequiresApi(Build.VERSION_CODES.N)
@@ -147,26 +143,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun toast(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
     }
-    override fun nextRadio(nextRadio: RadioProgramEntity) {
+    override fun nextRadio(nextRadio: RadioProgramEntity){
         val bundle = PersistableBundle()
         bundle.putInt("radioId", nextRadio.radioId)
+        bundle.putLong("stopService",abs(nextRadio.toHour
+                .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
         val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-
         startRadioPlayService(bundle, nextRadio, jobScheduler)
-        stopRadioService(nextRadio, jobScheduler)
     }
-
-    private fun stopRadioService(nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
-        val componentName1 = ComponentName(applicationContext, StopService::class.java)
-        val jobInfo1 = JobInfo.Builder(2, componentName1)
-                .setMinimumLatency(abs(nextRadio.toHour
-                        .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
-                .setOverrideDeadline(abs(nextRadio.toHour
-                        .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
-                .build()
-        jobScheduler.schedule(jobInfo1)
-    }
-
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
         val componentName = ComponentName(applicationContext, StartService::class.java)
         val jobInfo = JobInfo.Builder(1, componentName)
@@ -178,8 +162,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .build()
         jobScheduler.schedule(jobInfo)
     }
-
-
+    fun setOnClickListener(listener: FragmentClickListener) {
+        this.listener = listener
+    }
 }
 interface FragmentClickListener {
     fun toAlphabetical()

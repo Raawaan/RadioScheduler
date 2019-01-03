@@ -1,10 +1,13 @@
 package com.example.rawan.radio.audioPlayer
 
+
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-
 import com.bumptech.glide.Glide
+import com.example.rawan.radio.R
+
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -21,17 +24,17 @@ class MediaImageProvider(context: Context, private val onImageUpdated: () -> Uni
     private val remoteViewImageTarget = RemoteViewImageTarget()
 
     private val defaultNotificationImage: Bitmap by lazy { BitmapFactory.decodeResource(context.resources,
-            android.R.mipmap.sym_def_app_icon) }
+           R.drawable.ic_radio_black_24dp ) }
 
     private var notificationImage: Bitmap? = null
     override var remoteViewArtwork: Bitmap? = null
         private set
 
     override val notificationIconRes: Int
-        get() =  android.R.mipmap.sym_def_app_icon
+        get() =  R.drawable.ic_radio_black_24dp
 
     override val remoteViewIconRes: Int
-        get() =  android.R.mipmap.sym_def_app_icon
+        get() =  R.drawable.ic_radio_black_24dp
 
     override val largeNotificationImage: Bitmap?
         get() = if (notificationImage != null) notificationImage else defaultNotificationImage

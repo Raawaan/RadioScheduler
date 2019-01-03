@@ -30,9 +30,8 @@ interface RadioProgramDao{
     @Query("update radioProgram set fromHour =:fromHour, toHour=:toHour where programId=:programId AND radioId=:radioId AND fromHour=:fromHourExisted ")
     fun updateRadio(fromHour:Long, toHour:Long, programId:Int, radioId:Int,fromHourExisted:Long)
 
- @Query("select * from radioProgram,programDay where fromHour>:currentTime AND programDay.days=:day ORDER BY fromHour LIMIT 1")
+ @Query("select * from radioProgram,programDay where fromHour>:currentTime AND programDay.days=:day AND radioProgram.programId=programDay.programId ORDER BY fromHour LIMIT 1")
     fun selectNextRadio(currentTime:Long,day:Int):RadioProgramEntity
-
     @Delete
     fun delete(radioProgramEntity: RadioProgramEntity)
 }

@@ -1,9 +1,14 @@
 package com.example.rawan.radio
 
+import android.app.job.JobInfo
 import android.app.job.JobParameters
+import android.app.job.JobScheduler
 import android.app.job.JobService
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.PersistableBundle
 import android.support.annotation.RequiresApi
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +28,9 @@ import com.example.rawan.radio.audioPlayer.model.MediaItem
 import com.example.rawan.radio.audioPlayer.presenter.AudioPlayerPresenter
 import com.example.rawan.radio.audioPlayer.view.AudioPlayerUI
 import com.example.rawan.radio.radioDatabase.RadioDatabase
+import com.example.rawan.radio.radioDatabase.RadioProgramEntity
 import kotlinx.android.synthetic.main.audio_player_activity.view.*
+import kotlin.math.abs
 
 
 class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener, AudioPlayerUI {
@@ -43,7 +50,7 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
             this.startForegroundService(intent)
         }
         else{
-            startService(intent);
+            startService(intent)
         }
     }
         private var shouldSetDuration: Boolean = false
@@ -64,6 +71,16 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
             playlistManager.unRegisterProgressListener(this)
             return false
         }
+    private fun stopRadioService(stopMediaTime: Long) {
+        val componentName1 = ComponentName(applicationContext, StopService::class.java)
+        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+
+        val jobInfo1 = JobInfo.Builder(3, componentName1)
+                .setMinimumLatency(stopMediaTime)
+                .setOverrideDeadline(stopMediaTime)
+                .build()
+        jobScheduler.schedule(jobInfo1)
+    }
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onStartJob(p0: JobParameters?): Boolean {
             Toast.makeText(this,"Stream Started",Toast.LENGTH_LONG).show()
@@ -73,12 +90,15 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
             ))
 
             p0?.extras?.get("radioId")?.toString()?.toInt()?.let { init(it) }
+            p0?.extras?.get("stopService")?.toString()?.toLong()?.let { stopRadioService(it) }
             playlistManager = (applicationContext as MyApplication).playlistManager
             playlistManager.registerPlaylistListener(this)
             playlistManager.registerProgressListener(this)
 
             //Makes sure to retrieve the current playback information
             updateCurrentPlaybackInformation()
+
+
             return false
         }
 
@@ -145,6 +165,7 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
          * Performs the initialization of the views and any other
          * general setup
          */
+        @RequiresApi(Build.VERSION_CODES.O)
         private fun init(radioId:Int) {
             setupListeners()
 

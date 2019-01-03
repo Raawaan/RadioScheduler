@@ -42,7 +42,6 @@ class StopService : JobService(), MainView {
     }
 
     override fun onStopJob(p0: JobParameters?): Boolean {
-
         return  false
     }
 
@@ -54,26 +53,22 @@ class StopService : JobService(), MainView {
     override fun nextRadio(nextRadio: RadioProgramEntity) {
         val bundle = PersistableBundle()
         bundle.putInt("radioId", nextRadio.radioId)
+        bundle.putLong("stopService",abs(nextRadio.toHour
+                .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
         val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        startRadioPlayService(bundle, nextRadio, jobScheduler)
+
+    }
+    private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
         val componentName = ComponentName(applicationContext, StartService::class.java)
         val jobInfo = JobInfo.Builder(1, componentName)
                 .setExtras(bundle)
                 .setMinimumLatency(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
                         .plus(time.minute * 60000)))))
                 .setOverrideDeadline(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
-                        .plus(time.minute * 60000)))) +600)
+                        .plus(time.minute * 60000)))))
                 .build()
         jobScheduler.schedule(jobInfo)
-
-        val componentName1 = ComponentName(applicationContext, StopService::class.java)
-        val jobInfo1 = JobInfo.Builder(2, componentName1)
-                .setMinimumLatency(abs(nextRadio.toHour
-                        .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
-                .setOverrideDeadline(abs(nextRadio.toHour
-                        .minus((time.hour * 60000 * 60).plus(time.minute * 60000))) +600)
-                .build()
-        jobScheduler.schedule(jobInfo1)
-
     }
 
     override fun toast(message: String) {
