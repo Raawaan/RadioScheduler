@@ -27,10 +27,9 @@ object NotificationUtilities{
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setStyle(NotificationCompat.BigTextStyle().bigText("klam"))
                 .setSmallIcon(R.drawable.ic_radio_black_24dp)
-                .setAutoCancel(false)
                 .setShortcutId("radioId")
-                .setOnlyAlertOnce(true)
-                .setOngoing(true)
+                .setOnlyAlertOnce(false)
+                .setOngoing(false)
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }
     fun removeNotification(context: Context){

@@ -1,15 +1,8 @@
 package com.example.rawan.radio
 
-import android.app.Service
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
-import android.os.IBinder
-import android.app.job.JobInfo
-import android.content.Context.JOB_SCHEDULER_SERVICE
-import android.app.job.JobScheduler
-import android.content.ComponentName
-import android.content.Context
 import android.os.PersistableBundle
 import android.text.format.Time
 import android.widget.Toast
@@ -19,14 +12,12 @@ import com.example.rawan.radio.main.presenter.MainPresenter
 import com.example.rawan.radio.main.view.MainView
 import com.example.rawan.radio.radioDatabase.RadioDatabase
 import com.example.rawan.radio.radioDatabase.RadioProgramEntity
-import kotlin.math.abs
-import com.example.rawan.radio.main.view.MainActivity
 import java.util.*
 
 
 class StopService : JobService(), MainView {
     private val time = Time()
-    lateinit var mainPresenter: MainPresenter
+    private lateinit var mainPresenter: MainPresenter
     override fun onStartJob(p0: JobParameters?): Boolean {
         time.setToNow()
         val c = Calendar.getInstance()
@@ -48,30 +39,17 @@ class StopService : JobService(), MainView {
     override fun onDestroy() {
         super.onDestroy()
         Toast.makeText(this,"Stop service Stopped",Toast.LENGTH_LONG).show()
-
     }
     override fun nextRadio(nextRadio: RadioProgramEntity) {
         val bundle = PersistableBundle()
         bundle.putInt("radioId", nextRadio.radioId)
-        bundle.putLong("stopService",abs(nextRadio.toHour
-                .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
-        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        if(!MediaService().isInstanceCreated())
-        startRadioPlayService(bundle, nextRadio, jobScheduler)
-
+        bundle.putLong("stopService",nextRadio.toHour)
+        startRadioPlayService(bundle, nextRadio)
     }
-    private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
-        val componentName = ComponentName(applicationContext, StartService::class.java)
-        val jobInfo = JobInfo.Builder(1, componentName)
-                .setExtras(bundle)
-                .setMinimumLatency(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
-                        .plus(time.minute * 60000)))))
-                .setOverrideDeadline(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
-                        .plus(time.minute * 60000)))))
-                .build()
-        jobScheduler.schedule(jobInfo)
+    private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {
+        MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(nextRadio.fromHour),
+                applicationContext,StartService::class.java,bundle,1 )
     }
-
     override fun toast(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
     }

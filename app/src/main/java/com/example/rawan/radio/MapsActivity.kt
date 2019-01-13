@@ -2,6 +2,7 @@ package com.example.rawan.radio
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,8 +23,26 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import java.io.IOException
 import java.util.*
+import com.google.android.gms.location.LocationSettingsStatusCodes
+import android.content.IntentSender
+import android.location.Location
+import com.example.rawan.radio.main.view.MainActivity
+import com.google.android.gms.location.LocationSettingsResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.ResultCallback
+import com.google.android.gms.maps.UiSettings
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
+
+    override fun onMyLocationButtonClick(): Boolean {
+        displayLocationSettingsRequest(this)
+        return true
+    }
+
     private lateinit var mMap: GoogleMap
     private val LOCATION_REQUEST_CODE = 1
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +58,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     LOCATION_REQUEST_CODE)
+
         }
+
     }
 
     @SuppressLint("MissingPermission")
@@ -47,11 +68,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             LOCATION_REQUEST_CODE -> {
-                if (grantResults.isEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
-
-                }
-                else if (Build.VERSION.SDK_INT >= 23 &&(grantResults.isNotEmpty() ||!shouldShowRequestPermissionRationale(permissions[0]))){
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED){
 
                     val   alertDialogBuilder = AlertDialog.Builder(this)
                     alertDialogBuilder.setTitle("Change Permissions in Settings")
@@ -70,7 +87,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 else{
+
                     mMap.isMyLocationEnabled=true
+                    displayLocationSettingsRequest(this)
 
                 }
             }
@@ -89,28 +108,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-
         mMap = googleMap
+
         if (checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
         mMap.isMyLocationEnabled=true
+
+            displayLocationSettingsRequest(this)
+        }
+        mMap.setOnMyLocationClickListener {
+            displayLocationSettingsRequest(this)
         }
         mMap.setOnMapLongClickListener {
+            if (InternetConnection.isOnline(this)){
             val geoCoder = Geocoder(this, Locale.getDefault())
-//            val addresses: List<Address>?
+                 val addresses: List<Address>
 
-
-            var addresses: List<Address> = emptyList()
-
-            try {
+                try {
                 addresses = geoCoder.getFromLocation(it.latitude, it.longitude, 1)
                 if (addresses != null&& addresses.isNotEmpty()) {
 
                 Toast.makeText(this,addresses[0].countryName, Toast.LENGTH_SHORT).show()
                 val intent = Intent()
                 intent.putExtra("countryCode",addresses[0].countryCode)
-//                intent.putExtra("countryName",oneAddresses.countryName)
                 setResult(2,intent)
                 finish()
                 }
@@ -123,22 +144,49 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Catch network or other I/O problems.
             } catch (illegalArgumentException: IllegalArgumentException) {
                 Toast.makeText(this,illegalArgumentException.toString(),Toast.LENGTH_LONG).show()
-
             }
+        }
+            else
+              Toast.makeText(this,"Check Your Internet Connection", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun displayLocationSettingsRequest(context: Context) {
+        val googleApiClient = GoogleApiClient.Builder(context)
+                .addApi(LocationServices.API).build()
+        googleApiClient.connect()
+
+        val locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = (10000 / 2).toLong()
+
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+
+        val result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+        result.setResultCallback { result ->
+            val status = result.status
+            when (status.statusCode) {
+                LocationSettingsStatusCodes.SUCCESS ->
+                    Toast.makeText(context,"All location settings are satisfied.", Toast.LENGTH_SHORT).show()
+                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                    Toast.makeText(context,"Location settings are not satisfied. Show the user a dialog to upgrade location settings ", Toast.LENGTH_SHORT).show()
 
 
-//            addresses = geoCoder.getFromLocation(it.latitude, it.longitude, 1)
-//            if (addresses != null&& addresses.isNotEmpty()) {
-//                val oneAddresses = geoCoder.getFromLocation(it.latitude, it.longitude, 1)[0]
-//                Toast.makeText(this,oneAddresses.countryName, Toast.LENGTH_SHORT).show()
-//                val intent = Intent()
-//                intent.putExtra("countryCode",oneAddresses.countryCode)
-////                intent.putExtra("countryName",oneAddresses.countryName)
-//                setResult(2,intent)
-//                finish()
-//            }
-//            else
-//                Toast.makeText(this,"Location not found", Toast.LENGTH_SHORT).show()
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        status.startResolutionForResult(this@MapsActivity, 1)
+                    } catch (e: IntentSender.SendIntentException) {
+                        Toast.makeText(context,"PendingIntent unable to execute request.", Toast.LENGTH_SHORT).show()
+
+                    }
+
+                }
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE ->
+                    Toast.makeText(context,"Location settings are inadequate, and cannot be fixed here. Dialog not created.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

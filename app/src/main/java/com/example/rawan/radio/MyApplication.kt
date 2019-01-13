@@ -29,17 +29,19 @@ class MyApplication:Application(){
         super.onCreate()
         Stetho.initializeWithDefaults(this)
         time.setToNow()
-        val now = time.hour*60000*60+time.minute*60000-6000
+        val now = time.hour*60*60+time.minute*60
+        val start =abs((86410).minus(now))
+        val end =abs((86410).minus(now))+60
         val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(this))
         val job = dispatcher.newJobBuilder()
                 .setService(MyJobService::class.java)
                 .setTag("my-recurring-tag")
-                .setTrigger(Trigger.executionWindow(abs((86442000).minus(now)), abs((86454000).minus(now))))
+                .setTrigger(Trigger.executionWindow(start, end))
                 .setLifetime(Lifetime.FOREVER)
-                .setRecurring(true)
+                .setRecurring(false)
                 .setReplaceCurrent(true)
                 .build()
-        dispatcher.schedule(job)
+        dispatcher.mustSchedule(job)
     }
 }
 

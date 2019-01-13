@@ -14,16 +14,12 @@ import com.example.rawan.radio.audioPlayer.model.MediaItem
  */
 class MediaService : BasePlaylistService<MediaItem, PlaylistManager>() {
 
-    private var instance: MediaService? = null
 
-    fun isInstanceCreated(): Boolean {
-        return instance!=null
-    }
     override val playlistManager by lazy { (applicationContext as MyApplication).playlistManager }
 
     override fun onCreate() {
         super.onCreate()
-        instance=this
+        Toast.makeText(this,"Stream Started",Toast.LENGTH_LONG).show()
         // Adds the audio player implementation, otherwise there's nothing to play media with
         playlistManager.mediaPlayers.add(AudioApi(applicationContext))
     }

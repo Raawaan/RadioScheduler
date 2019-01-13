@@ -1,6 +1,8 @@
 package com.example.rawan.radio.addProgram.view
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.example.rawan.radio.R
@@ -23,6 +25,9 @@ import com.example.rawan.radio.addProgram.model.RadioPreviewAdapter
 import com.example.rawan.radio.searchForRadio.model.RadioProgramFromTo
 import com.example.rawan.radio.searchForRadio.view.SearchForRadioActivity
 import kotlinx.android.synthetic.main.add_date_radio.view.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.net.URI
 import java.util.*
 
@@ -99,7 +104,8 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
             RVReviewItem.layoutManager = LinearLayoutManager(this)
             if (list?.isNotEmpty() == true) {
                 val radioPreviewAdapter = RadioPreviewAdapter(list, this,
-                        clickListener = {true
+                        clickListener = {
+                            true
                         })
                 RVReviewItem.adapter = radioPreviewAdapter
             }
@@ -131,19 +137,45 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
         if (list?.isNotEmpty() == true&&flag) {
                 if (etProgramName.text.isNullOrEmpty())
                     programNameLayout.error = getString(R.string.error_name)
-                else {
+                else if (imageData!=null) {
                     programNameLayout.isErrorEnabled = false
                     addProgramPresenter.addProgram(etProgramName.text.toString(),
-                            imageDataPath.toString(),
+                            saveToInternalStorage(imageData!!,etProgramName.text.toString()),
                             if (favorite.background.constantState == getDrawable(R.drawable.ic_favorite_black_24dp).constantState)
                                 1
                             else
                                 0
                             , weekdaysPicker.selectedDays,
                             list!!)
+                } else if (imageData==null){
+                    Toast.makeText(this, "please choose program image", Toast.LENGTH_SHORT).show()
                 }
             } else if (list?.isNotEmpty() == false)
                 Toast.makeText(this, "please Add radio", Toast.LENGTH_SHORT).show()
 
         }
+    private fun saveToInternalStorage(bitmapImage: Bitmap,radioName:String): String {
+        val cw = ContextWrapper(applicationContext)
+        // path to /data/data/yourapp/app_data/imageDir
+        val directory = cw.getDir("Radio", Context.MODE_APPEND)
+        // Create imageDir
+        val myPath = File(directory, "$radioName.jpg")
+
+        var fos: FileOutputStream? = null
+        try {
+            fos = FileOutputStream(myPath)
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                fos!!.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+        }
+        return directory.absolutePath
+    }
 }

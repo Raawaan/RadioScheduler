@@ -13,6 +13,11 @@ import android.support.annotation.RequiresApi
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.preview_list.view.*
 import java.util.concurrent.TimeUnit
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 
 
 /**
@@ -45,27 +50,38 @@ class ProgramsListAdapter(private var programsList: List<ProgramAndRadioProgram>
         }
         holder.itemView.programNameList.text = program?.programName
         holder.itemView.tvToListOfPrograms.text =
-                context.getString(R.string.timeFormatTo,
+                context.getString(com.example.rawan.radio.R.string.timeFormatTo,
                         TimeUnit.MILLISECONDS.toMinutes(program?.to!!).div(60).toString(),
                         (TimeUnit.MILLISECONDS.toMinutes(program.to)%60).toString())
         holder.itemView.tvFromListOfPrograms.text =
-                context.getString(R.string.timeFormatFrom,
+                context.getString(com.example.rawan.radio.R.string.timeFormatFrom,
 
                         TimeUnit.MILLISECONDS.toMinutes(program.from).div(60).toString(),
                         (TimeUnit.MILLISECONDS.toMinutes(program.from)%60).toString())
-//        if (program.programImage !=null){
-//        val uri = Uri.parse(program.programImage)
-//        Picasso.get().load(uri).fit().centerCrop().into(holder.itemView.programImageList)
-//        }
-//        else
-        holder.itemView.programImageList.setImageResource(R.drawable.ic_image_black_24dp)
-        if (program?.favorite == 1)
-            holder.itemView.favoriteListOfPrograms.setImageResource(R.drawable.ic_favorite_black_24dp)
+        if (loadImageFromStorage(program.programImage,program.programName) !=null){
+            holder.itemView.programImageList.setImageBitmap(loadImageFromStorage(program.programImage,program.programName))
+        }
+        else
+        holder.itemView.programImageList.setImageResource(com.example.rawan.radio.R.drawable.ic_image_black_24dp)
+        if (program.favorite == 1)
+            holder.itemView.favoriteListOfPrograms.setImageResource(com.example.rawan.radio.R.drawable.ic_favorite_black_24dp)
 
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramsListHolderView {
         return ProgramsListHolderView(LayoutInflater.from(parent.context)
-                .inflate(R.layout.list_of_programs, parent, false))
+                .inflate(com.example.rawan.radio.R.layout.list_of_programs, parent, false))
+    }
+
+    private fun loadImageFromStorage(path: String,programName:String) :Bitmap?{
+
+        try {
+            val f = File(path, "$programName.jpg")
+            val b = BitmapFactory.decodeStream(FileInputStream(f))
+           return b
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     override fun getItemCount() = programsList!!.size

@@ -67,7 +67,6 @@ class ListOfProgramsRadiosActivity : AppCompatActivity(),ListOfProgramsRadiosVie
                                  return@setOnClickListener
                              }
                          }
-
                      }
                          presenter.selectFromToDay(programName,fromDateLong,toDateLong,fromToRadio.programId,fromToRadio.radioId,fromToRadio.fromHour)
                      }

@@ -33,7 +33,7 @@ interface ProgramDao{
     fun deleteProgram(programEntity: ProgramEntity):Int
 
     @Query("select * from program,radioProgram,radio where program.programId=radioProgram.programId AND " +
-            "program.programName=:programName AND radio.radioId=radioProgram.radioId")
+            "program.programName=:programName AND radio.radioId=radioProgram.radioId order by radioProgram.fromHour ")
     fun selectAllProgramsRadio(programName:String):LiveData<List<ListOfProgramRadio>>
 
      @Query("select program.programId, programName,programImage,favorite,min(fromHour) as 'from' , max(toHour) as 'to' from radioProgram ," +

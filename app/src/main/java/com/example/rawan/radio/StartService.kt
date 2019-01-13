@@ -1,14 +1,10 @@
 package com.example.rawan.radio
 
-import android.app.job.JobInfo
 import android.app.job.JobParameters
-import android.app.job.JobScheduler
 import android.app.job.JobService
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.PersistableBundle
 import android.support.annotation.RequiresApi
 import android.view.LayoutInflater
 import android.view.View
@@ -28,9 +24,10 @@ import com.example.rawan.radio.audioPlayer.model.MediaItem
 import com.example.rawan.radio.audioPlayer.presenter.AudioPlayerPresenter
 import com.example.rawan.radio.audioPlayer.view.AudioPlayerUI
 import com.example.rawan.radio.radioDatabase.RadioDatabase
-import com.example.rawan.radio.radioDatabase.RadioProgramEntity
 import kotlinx.android.synthetic.main.audio_player_activity.view.*
-import kotlin.math.abs
+import android.app.ActivityManager
+
+
 
 
 class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener, AudioPlayerUI {
@@ -42,16 +39,30 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
             const val PLAYLIST_ID = 4 //Arbitrary, for the example
         }
 
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
     override fun onCreate() {
         super.onCreate()
-
-        val intent = Intent(this, MediaService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intent)
+        if(InternetConnection.isOnline(this)){
+        if(!isMyServiceRunning(MediaService::class.java)){
+            val intent = Intent(this, MediaService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.startForegroundService(intent)
+            }
+            else{
+                startService(intent)
+            }
         }
-        else{
-            startService(intent)
-        }
+    }
+        else
+            Toast.makeText(this,"Check your internet connection",Toast.LENGTH_LONG).show()
     }
         private var shouldSetDuration: Boolean = false
         private var userInteracting: Boolean = false
@@ -72,18 +83,11 @@ class StartService: JobService(), PlaylistListener<MediaItem>, ProgressListener,
             return false
         }
     private fun stopRadioService(stopMediaTime: Long) {
-        val componentName1 = ComponentName(applicationContext, StopService::class.java)
-        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-
-        val jobInfo1 = JobInfo.Builder(3, componentName1)
-                .setMinimumLatency(stopMediaTime)
-                .setOverrideDeadline(stopMediaTime)
-                .build()
-        jobScheduler.schedule(jobInfo1)
+        MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(stopMediaTime),
+                applicationContext,StopService::class.java, null,3 )
     }
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onStartJob(p0: JobParameters?): Boolean {
-            Toast.makeText(this,"Stream Started",Toast.LENGTH_LONG).show()
             view = LayoutInflater.from(this).inflate(R.layout.audio_player_activity,null)
             audioPlayerPresenter= AudioPlayerPresenter(this, AudioPlayerModel(
                     RadioDatabase.getInstance(this)

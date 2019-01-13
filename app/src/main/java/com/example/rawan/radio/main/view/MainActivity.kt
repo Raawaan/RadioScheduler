@@ -15,41 +15,35 @@ import android.app.Activity
 import android.support.v4.app.Fragment
 import android.text.format.Time
 import com.example.rawan.radio.addProgram.view.AddProgramActivity
-import android.app.job.JobScheduler
-import android.app.job.JobInfo
-import android.content.ComponentName
-import android.content.Context
 import android.os.Build
 import android.os.PersistableBundle
 import android.support.annotation.RequiresApi
 import android.widget.Toast
 import com.example.rawan.radio.*
 import com.example.rawan.radio.StartService
-import com.example.rawan.radio.audioPlayer.MediaService
 import com.example.rawan.radio.main.model.MainModel
 import com.example.rawan.radio.main.presenter.MainPresenter
 import com.example.rawan.radio.radioDatabase.RadioDatabase
 import com.example.rawan.radio.radioDatabase.RadioProgramEntity
 import java.util.*
-import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,MainView {
 
     private var listener: FragmentClickListener? = null
-    private val time = Time()
     lateinit var mainPresenter: MainPresenter
+    private val time = Time()
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         supportFragmentManager.beginTransaction().add(R.id.fragmentPlaceholder, HomeFragment.newInstance(), "a").commit()
-
         fab.setOnClickListener { view ->
-     val intent = Intent(this, AddProgramActivity::class.java)
-            startActivity(intent)
-        }
+         val intent = Intent(this, AddProgramActivity::class.java)
+                startActivity(intent)
+            }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -61,8 +55,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
-        time.setToNow()
         val c = Calendar.getInstance()
+        time.setToNow()
         mainPresenter= MainPresenter(this, MainModel(RadioDatabase.getInstance(this)))
         mainPresenter.selectNextRadio((time.hour*60000*60+time.minute*60000-6000).toLong(),
                 c.get(Calendar.DAY_OF_WEEK))
@@ -143,23 +137,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun nextRadio(nextRadio: RadioProgramEntity){
         val bundle = PersistableBundle()
         bundle.putInt("radioId", nextRadio.radioId)
-        bundle.putLong("stopService",abs(nextRadio.toHour
-                .minus((time.hour * 60000 * 60).plus(time.minute * 60000))))
-        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        if(!MediaService().isInstanceCreated()){
-            startRadioPlayService(bundle, nextRadio, jobScheduler)
-        }
+        bundle.putLong("stopService",nextRadio.toHour)
+            startRadioPlayService(bundle, nextRadio)
     }
-    private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity, jobScheduler: JobScheduler) {
-        val componentName = ComponentName(applicationContext, StartService::class.java)
-        val jobInfo = JobInfo.Builder(1, componentName)
-                .setExtras(bundle)
-                .setMinimumLatency(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
-                        .plus(time.minute * 60000)))))
-                .setOverrideDeadline(abs((nextRadio.fromHour.minus((time.hour * 60000 * 60)
-                        .plus(time.minute * 60000)))))
-                .build()
-        jobScheduler.schedule(jobInfo)
+    private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {
+       MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(nextRadio.fromHour),
+              applicationContext,StartService::class.java,bundle,1 )
     }
     fun setOnClickListener(listener: FragmentClickListener) {
         this.listener = listener

@@ -6,6 +6,8 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -23,6 +25,9 @@ import com.example.rawan.radio.searchForRadio.model.RadioProgramFromTo
 import com.example.rawan.radio.searchForRadio.view.SearchForRadioActivity
 import kotlinx.android.synthetic.main.activity_edit_program.*
 import kotlinx.android.synthetic.main.activiy_add_program.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.util.*
 
 class EditProgramActivity : AppCompatActivity(),EditProgramView, LifecycleOwner {
@@ -41,6 +46,12 @@ class EditProgramActivity : AppCompatActivity(),EditProgramView, LifecycleOwner 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_program)
          programName = intent.extras["programName"].toString()
+         val programImage = intent.extras["programImage"].toString()
+        if (programImage.isNotEmpty()){
+        imageChosenEditProgram.setImageBitmap(loadImageFromStorage(programImage,programName))
+            imageChosenEditProgram.background = null
+        }
+
         editProgramToolbar.title= "Edit $programName"
 
         editProgramPresenter= EditProgramPresenter(EditProgramModel(RadioDatabase.getInstance(this)),
@@ -149,5 +160,16 @@ class EditProgramActivity : AppCompatActivity(),EditProgramView, LifecycleOwner 
 
     override fun getLifecycle(): Lifecycle {
         return mLifecycleRegistry
+    }
+    private fun loadImageFromStorage(path: String,programName:String) : Bitmap?{
+
+        try {
+            val f = File(path, "$programName.jpg")
+            val b = BitmapFactory.decodeStream(FileInputStream(f))
+            return b
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return null
     }
 }

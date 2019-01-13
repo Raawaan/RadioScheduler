@@ -113,4 +113,7 @@ dependencies {
     // optional - Test helpers
     androidTestImplementation "android.arch.work:work-testing:$work_version"
     implementation "com.android.support:support-media-compat:$rootProject.ext.supportLibVersion"
+
+    //location
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
 }
