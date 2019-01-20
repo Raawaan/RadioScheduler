@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="internet"
+        android:summaryOn="WIFI only"
+        android:summaryOff="All types are supported"
+        android:title="Internet connection type" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="sound"
+        android:summaryOn="Enabled"
+        android:summaryOff="Disabled"
+        android:title="Sound" />
+</PreferenceScreen>

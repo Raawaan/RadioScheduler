@@ -1,5 +1,6 @@
 package com.example.rawan.radio.editProgram.presenter
 
+import android.graphics.Bitmap
 import com.example.rawan.radio.addProgram.model.FromToDays
 import com.example.rawan.radio.editProgram.model.EditProgramModel
 import com.example.rawan.radio.editProgram.view.EditProgramView
@@ -61,7 +62,7 @@ class EditProgramPresenter(private val editProgramModel: EditProgramModel
                     editProgramView.toast(it.toString())
                 })
     }
-    fun selectFromToDay(days:List<Int>,programName:String,list: List<RadioProgramFromTo>,listOfExsitedAndChosenRadiosModel:MutableList<RadioProgramFromTo>?,selectedDays:List<Int>){
+    fun selectFromToDay(userChoseNewImage:Boolean,imagePath:String,days:List<Int>,programName:String,list: List<RadioProgramFromTo>,listOfExsitedAndChosenRadiosModel:MutableList<RadioProgramFromTo>?,selectedDays:List<Int>){
         editProgramModel.selectFromToDay(days)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -91,6 +92,17 @@ class EditProgramPresenter(private val editProgramModel: EditProgramModel
                         onError = {
                             editProgramView.toast(it.localizedMessage)
                         })
+        if(userChoseNewImage){
+            editProgramModel.updateImage(imagePath,programName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                            onNext = {
+                            },
+                            onError = {
+                                editProgramView.toast(it.localizedMessage)
+                            })
+        }
 
     }
     private fun enableSelectedDays(fromToDays: List<FromToDays>, listOfExsitedAndChosenRadiosModel:MutableList<RadioProgramFromTo>?) {

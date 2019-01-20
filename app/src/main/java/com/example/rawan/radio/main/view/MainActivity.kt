@@ -12,12 +12,18 @@ import com.example.rawan.radio.home.view.HomeFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import android.app.Activity
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS
+import android.content.ComponentName
 import android.support.v4.app.Fragment
 import android.text.format.Time
 import com.example.rawan.radio.addProgram.view.AddProgramActivity
 import android.os.Build
 import android.os.PersistableBundle
 import android.support.annotation.RequiresApi
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.example.rawan.radio.*
 import com.example.rawan.radio.StartService
@@ -25,19 +31,47 @@ import com.example.rawan.radio.main.model.MainModel
 import com.example.rawan.radio.main.presenter.MainPresenter
 import com.example.rawan.radio.radioDatabase.RadioDatabase
 import com.example.rawan.radio.radioDatabase.RadioProgramEntity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.android.synthetic.main.preview_list.view.*
 import java.util.*
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.OnCompleteListener
+
+
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,MainView {
 
-    private var listener: FragmentClickListener? = null
     lateinit var mainPresenter: MainPresenter
     private val time = Time()
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
+        val headerView = navigationView.getHeaderView(0)
+        val navUsername = headerView.findViewById(R.id.userName) as TextView
+        val navEmail = headerView.findViewById(R.id.userEmail) as TextView
+        val userImageIv = headerView.findViewById(R.id.userImage) as ImageView
+        navUsername.text=intent.extras.get("displayName").toString()
+        navEmail.text=intent.extras.get("email").toString()
+        if (intent.extras.get("photoUrl")!=null)
+            Picasso.get().load(intent.extras.get("photoUrl").toString()).fit().centerCrop().into(userImageIv)
+        else
+            userImageIv.setImageResource(R.drawable.ic_image_black_24dp)
+
         setSupportActionBar(toolbar)
         supportFragmentManager.beginTransaction().add(R.id.fragmentPlaceholder, HomeFragment.newInstance(), "a").commit()
         fab.setOnClickListener { view ->
@@ -70,28 +104,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.favorite -> {
-                listener?.toFavorite()
-                return true
-            }
-            R.id.alphabetical -> {
-                listener?.toAlphabetical()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -114,18 +127,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_share_app ->{
                 val sendIntent = Intent()
                 sendIntent.action = Intent.ACTION_SEND
+                sendIntent.type = "text/plain"
                 sendIntent.putExtra(Intent.EXTRA_TEXT,
                         "Hey all check out my new radio scheduler application!")
-                sendIntent.type = "text/plain"
-                startActivity(sendIntent)
+                startActivity(Intent.createChooser(sendIntent,"Share Radio Application"))
 //                replaceFragments(ShareApplicationFragment.newInstance())
             }
             R.id.nav_about ->{
                 replaceFragments(AboutFragment.newInstance())
             }
+            R.id.nav_sign_out-> signOut()
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this) {
+                    Intent(this,SignInActivity::class.java).apply {
+                        startActivity(this)
+                    }
+                    finish()
+                }
     }
     private fun replaceFragments(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -133,22 +157,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     override fun toast(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+        sendBroadcast( WidgetNotifier.notify(application,this))
     }
     override fun nextRadio(nextRadio: RadioProgramEntity){
         val bundle = PersistableBundle()
         bundle.putInt("radioId", nextRadio.radioId)
         bundle.putLong("stopService",nextRadio.toHour)
             startRadioPlayService(bundle, nextRadio)
+        sendBroadcast( WidgetNotifier.notify(application,this))
     }
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {
        MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(nextRadio.fromHour),
               applicationContext,StartService::class.java,bundle,1 )
     }
-    fun setOnClickListener(listener: FragmentClickListener) {
-        this.listener = listener
-    }
-}
-interface FragmentClickListener {
-    fun toAlphabetical()
-    fun toFavorite()
 }

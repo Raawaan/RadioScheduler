@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.RequiresApi
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -23,7 +24,6 @@ import com.example.rawan.radio.home.model.HomeModel
 import com.example.rawan.radio.home.model.ProgramAndRadioProgram
 import com.example.rawan.radio.home.model.ProgramsListAdapter
 import com.example.rawan.radio.home.presenter.RequestAPIPresenter
-import com.example.rawan.radio.main.view.FragmentClickListener
 import com.example.rawan.radio.radioDatabase.RadioDatabase
 import com.example.rawan.radio.requestRadio.StreamsItem
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -31,7 +31,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import com.example.rawan.radio.main.view.MainActivity
 
 
-class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
+class HomeFragment : Fragment(),HomeView, LifecycleOwner {
 
     private lateinit var requestAPIPresenter: RequestAPIPresenter
     private lateinit var mLifecycleRegistry: LifecycleRegistry
@@ -42,11 +42,6 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
             return HomeFragment()
         }
     }
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        (activity as MainActivity).setOnClickListener(this)
-
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requestAPIPresenter= RequestAPIPresenter(HomeModel(RadioDatabase.getInstance(this.context)),this)
@@ -54,6 +49,7 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
+        setHasOptionsMenu(true)
         mLifecycleRegistry = LifecycleRegistry(this)
         mLifecycleRegistry.markState(Lifecycle.State.RESUMED)
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
@@ -87,16 +83,6 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
     override fun toast(msg: String) {
         Toast.makeText(context,msg,Toast.LENGTH_LONG).show()
     }
-    override fun toAlphabetical() {
-        viewModel.selectProgramAndRadioProgramByName().observe(this, Observer {listOfPrograms->
-            viewModelObservable(listOfPrograms)
-        })
-    }
-    override fun toFavorite() {
-        viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
-            viewModelObservable(listOfPrograms)
-        })
-    }
     private fun viewModelObservable(listOfPrograms: List<ProgramAndRadioProgram>?) {
         if (listOfPrograms?.isNotEmpty() == true) {
             tVEmptyList.visibility = View.GONE
@@ -119,6 +105,31 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner,FragmentClickListener {
         } else {
             tVEmptyList?.visibility = View.VISIBLE
             RVProgramsList.visibility = View.GONE
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.main, menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        when (item.itemId) {
+            R.id.favorite -> {
+                viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
+                    viewModelObservable(listOfPrograms)
+                })
+                return true
+            }
+            R.id.alphabetical -> {
+                viewModel.selectProgramAndRadioProgramByName().observe(this, Observer {listOfPrograms->
+                    viewModelObservable(listOfPrograms)
+                })
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
     }
 }

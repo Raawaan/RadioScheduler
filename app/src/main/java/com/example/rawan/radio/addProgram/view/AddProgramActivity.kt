@@ -18,18 +18,15 @@ import android.provider.MediaStore
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
 import android.widget.Toast
 import com.example.rawan.radio.addProgram.model.FromToDays
 import com.example.rawan.radio.addProgram.model.RadioPreviewAdapter
 import com.example.rawan.radio.searchForRadio.model.RadioProgramFromTo
 import com.example.rawan.radio.searchForRadio.view.SearchForRadioActivity
-import kotlinx.android.synthetic.main.add_date_radio.view.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.net.URI
-import java.util.*
+
 
 
 /**
@@ -42,11 +39,11 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
 
     private val REQUEST_CODE_OF_RADIOS = 1
     private val PICK_IMAGE = 20
+    private val CHOOSE_IMAGE_REQUEST = 30
     var list: List<RadioProgramFromTo>? = listOf()
 
     private lateinit var addProgramPresenter: AddProgramPresenter
     private var imageData: Bitmap? = null
-    private var imageDataPath: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activiy_add_program)
@@ -63,10 +60,7 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
             }
         }
         imageChosen.setOnClickListener {
-            val intent = Intent()
-            intent.type = getString(R.string.type_img)
-            intent.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_img)), PICK_IMAGE)
+             startDialog()
         }
         btnCancel.setOnClickListener {
             finish()
@@ -94,11 +88,16 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
             if (resultCode == Activity.RESULT_OK) {
                 imageData = MediaStore.Images.Media.getBitmap(this.contentResolver,
                         data?.data)
-                imageDataPath = data?.data
                 imageChosen.background = null
                 imageChosen.setImageBitmap(imageData)
             }
-        } else if (requestCode == REQUEST_CODE_OF_RADIOS
+        }
+        else  if (requestCode == CHOOSE_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            imageData = data!!.extras.get("data") as? Bitmap
+            imageChosen.background = null
+            imageChosen.setImageBitmap(imageData)
+        }
+        else if (requestCode == REQUEST_CODE_OF_RADIOS
                 && data?.extras?.getParcelableArray("listOfRadios")?.toList()?.isNotEmpty() == true) {
             list = data.extras?.getParcelableArray("listOfRadios")?.toList() as? List<RadioProgramFromTo>
             RVReviewItem.layoutManager = LinearLayoutManager(this)
@@ -165,7 +164,7 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
         try {
             fos = FileOutputStream(myPath)
             // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 50, fos)
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -177,5 +176,27 @@ class AddProgramActivity:AppCompatActivity(),AddProgramView {
 
         }
         return directory.absolutePath
+    }
+    private fun startDialog() {
+        val myAlertDialog = AlertDialog.Builder(
+                this)
+        myAlertDialog.setTitle("Upload Pictures Option")
+        myAlertDialog.setMessage("How do you want to set your picture?")
+
+        myAlertDialog.setPositiveButton("Gallery"
+        ) { arg0, arg1 ->
+            val intent = Intent()
+            intent.type = getString(R.string.type_img)
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_img)), PICK_IMAGE)
+
+        }
+
+        myAlertDialog.setNegativeButton("Camera"
+        ) { arg0, arg1 ->
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent, CHOOSE_IMAGE_REQUEST)
+        }
+        myAlertDialog.show()
     }
 }

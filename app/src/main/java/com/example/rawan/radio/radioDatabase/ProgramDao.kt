@@ -29,6 +29,9 @@ interface ProgramDao{
     @Query("update program set favorite =:favorite whERE programName=:programName")
     fun updateFavorite(favorite:Int,programName:String)
 
+    @Query("update program set programImage =:ImagePath whERE programName=:programName")
+    fun updateProgramImage(ImagePath:String,programName:String)
+
     @Delete
     fun deleteProgram(programEntity: ProgramEntity):Int
 

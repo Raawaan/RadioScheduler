@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit
 import javax.xml.datatype.DatatypeConstants.HOURS
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlin.math.abs
 
 
@@ -22,11 +23,12 @@ import kotlin.math.abs
  */
 class MyApplication:Application(){
     private val time = Time()
-
     val playlistManager: PlaylistManager by lazy { PlaylistManager(this) }
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(){
         super.onCreate()
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         Stetho.initializeWithDefaults(this)
         time.setToNow()
         val now = time.hour*60*60+time.minute*60

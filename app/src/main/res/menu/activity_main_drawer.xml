@@ -7,18 +7,22 @@
              android:id="@+id/nav_program"
              android:checked="true"
              android:icon="@drawable/nav_program"
-            android:title="Programs" />
+            android:title="@string/nav_program" />
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/nav_setting"
-            android:title="Setting" />
+            android:title="@string/nav_setting" />
         <item
             android:id="@+id/nav_share_app"
             android:icon="@drawable/nav_share"
-            android:title="Share Application" />
+            android:title="@string/nav_share_application" />
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/nav_about"
-            android:title="About" />
+            android:title="@string/nav_about" />
+        <item
+            android:id="@+id/nav_sign_out"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/nav_sign_out" />
         </group>
 </menu>

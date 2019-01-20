@@ -16,7 +16,7 @@ object NotificationUtilities{
     private val NOTIFICATION_CHANNEL_ID = "reminder_notification_channel"
     lateinit var notificationBuilder: NotificationCompat.Builder
     @RequiresApi(Build.VERSION_CODES.O)
-    fun notification(context: Context){
+    fun notification(context: Context):Notification{
 
         val notificationManager= context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationChannel= NotificationChannel(NOTIFICATION_CHANNEL_ID,
@@ -25,12 +25,13 @@ object NotificationUtilities{
 
         notificationManager.createNotificationChannel(notificationChannel)
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-                .setStyle(NotificationCompat.BigTextStyle().bigText("klam"))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(""))
                 .setSmallIcon(R.drawable.ic_radio_black_24dp)
                 .setShortcutId("radioId")
                 .setOnlyAlertOnce(false)
-                .setOngoing(false)
+                .setOngoing(true)
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        return notificationBuilder.build()
     }
     fun removeNotification(context: Context){
         val notificationManager= context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

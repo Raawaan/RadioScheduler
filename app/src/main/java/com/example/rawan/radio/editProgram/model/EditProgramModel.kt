@@ -1,5 +1,6 @@
 package com.example.rawan.radio.editProgram.model
 
+import android.graphics.Bitmap
 import com.example.rawan.radio.addProgram.model.FromToDays
 import com.example.rawan.radio.radioDatabase.*
 import com.example.rawan.radio.searchForRadio.model.RadioProgramFromTo
@@ -15,6 +16,11 @@ class EditProgramModel(val radioDatabase: RadioDatabase) {
     fun selectFromToDay(day:List<Int>):Observable<List<FromToDays>>{
         return Observable.fromCallable {
             radioDatabase.programDaysDao().selectHoursFromToAndDays(day)
+        }
+    }
+    fun updateImage(imagePath:String,programName:String):Observable<Unit>{
+        return Observable.fromCallable{
+            radioDatabase.programDao().updateProgramImage(imagePath,programName)
         }
     }
     fun selectSelectedDaysofProgram(programName: String): Observable<List<Int>> {
@@ -89,4 +95,5 @@ class EditProgramModel(val radioDatabase: RadioDatabase) {
             insertRadioProgram(listOfRadioProgram)
         }
     }
+
 }

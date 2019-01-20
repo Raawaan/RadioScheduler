@@ -45,6 +45,7 @@ class StopService : JobService(), MainView {
         bundle.putInt("radioId", nextRadio.radioId)
         bundle.putLong("stopService",nextRadio.toHour)
         startRadioPlayService(bundle, nextRadio)
+        sendBroadcast( WidgetNotifier.notify(application,this))
     }
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {
         MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(nextRadio.fromHour),
@@ -52,5 +53,6 @@ class StopService : JobService(), MainView {
     }
     override fun toast(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+        sendBroadcast( WidgetNotifier.notify(application,this))
     }
 }

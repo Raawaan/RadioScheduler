@@ -20,4 +20,16 @@
     <string name="station_added">added</string>
     <string name="choose_location">Please choose location</string>
     <string name="add_radios">Please Add Radio</string>
+    <string name="about_app">Schedule radios to play at any specific interval.  Choose radio stations from any place in the world.</string>
+    <string name="app_version">Version 1.1</string>
+    <string name="welcome_screen">Welcome to Radio scheduler application.  Please sign in.</string>
+    <string name="nav_program">Programs</string>
+    <string name="nav_setting">Setting</string>
+    <string name="nav_share_application">Share Application</string>
+    <string name="nav_about">About</string>
+    <string name="nav_sign_out">Sign Out</string>
+    <string name="no_upcoming_radios">No upcoming radios</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_update">Update</string>
+    <string name="btn_add_radio">Add Radio</string>
 </resources>

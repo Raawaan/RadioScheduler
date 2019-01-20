@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: android.arch.work:work-testing:1.0.0-alpha12@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/work-testing-1.0.0-alpha12.aar/0c09680bde08bd40eab1d9555a5343ea/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/work-testing-1.0.0-alpha12.aar/0c09680bde08bd40eab1d9555a5343ea/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/work-testing-1.0.0-alpha12.aar/372d9017313a8ea930d9a88e855b960f/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/work-testing-1.0.0-alpha12.aar/372d9017313a8ea930d9a88e855b960f/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
