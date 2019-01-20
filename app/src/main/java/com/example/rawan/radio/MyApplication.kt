@@ -22,7 +22,6 @@ import kotlin.math.abs
  * Created by rawan on 22/11/18.
  */
 class MyApplication:Application(){
-    private val time = Time()
     val playlistManager: PlaylistManager by lazy { PlaylistManager(this) }
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
@@ -30,20 +29,6 @@ class MyApplication:Application(){
         super.onCreate()
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         Stetho.initializeWithDefaults(this)
-        time.setToNow()
-        val now = time.hour*60*60+time.minute*60
-        val start =abs((86410).minus(now))
-        val end =abs((86410).minus(now))+60
-        val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(this))
-        val job = dispatcher.newJobBuilder()
-                .setService(MyJobService::class.java)
-                .setTag("my-recurring-tag")
-                .setTrigger(Trigger.executionWindow(start, end))
-                .setLifetime(Lifetime.FOREVER)
-                .setRecurring(false)
-                .setReplaceCurrent(true)
-                .build()
-        dispatcher.mustSchedule(job)
     }
 }
 

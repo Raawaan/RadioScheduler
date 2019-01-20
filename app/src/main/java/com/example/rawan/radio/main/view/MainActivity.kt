@@ -31,6 +31,10 @@ import com.example.rawan.radio.main.model.MainModel
 import com.example.rawan.radio.main.presenter.MainPresenter
 import com.example.rawan.radio.radioDatabase.RadioDatabase
 import com.example.rawan.radio.radioDatabase.RadioProgramEntity
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.GooglePlayDriver
+import com.firebase.jobdispatcher.Lifetime
+import com.firebase.jobdispatcher.Trigger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -41,8 +45,7 @@ import kotlinx.android.synthetic.main.preview_list.view.*
 import java.util.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.OnCompleteListener
-
-
+import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,MainView {
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        everyMorningCheckUp()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build()
@@ -169,5 +173,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {
        MyJobScheduler.radioJobScheduler(TimeInMilliSeconds.timeInMilli(nextRadio.fromHour),
               applicationContext,StartService::class.java,bundle,1 )
+    }
+    private fun everyMorningCheckUp(){
+        time.setToNow()
+        val now = time.hour*60*60+time.minute*60
+        val start = abs((86410).minus(now))
+        val end = abs((86410).minus(now)) +60
+        val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(this))
+        val job = dispatcher.newJobBuilder()
+                .setService(MyJobService::class.java)
+                .setTag("my-recurring-tag")
+                .setTrigger(Trigger.executionWindow(start, end))
+                .setLifetime(Lifetime.FOREVER)
+                .setRecurring(false)
+                .setReplaceCurrent(true)
+                .build()
+        dispatcher.mustSchedule(job)
     }
 }

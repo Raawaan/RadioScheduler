@@ -29,7 +29,6 @@ object NotificationUtilities{
                 .setSmallIcon(R.drawable.ic_radio_black_24dp)
                 .setShortcutId("radioId")
                 .setOnlyAlertOnce(false)
-                .setOngoing(true)
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
         return notificationBuilder.build()
     }

@@ -15,6 +15,7 @@
         <item
             android:id="@+id/nav_share_app"
             android:icon="@drawable/nav_share"
+            android:checkable="false"
             android:title="@string/nav_share_application" />
         <item
             android:id="@+id/nav_about"

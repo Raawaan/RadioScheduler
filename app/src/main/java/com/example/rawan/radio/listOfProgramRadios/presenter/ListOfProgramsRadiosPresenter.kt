@@ -18,6 +18,7 @@ class ListOfProgramsRadiosPresenter(private val listOfProgramsRadiosModel: ListO
                 .subscribeBy(
                         onNext = {
                             listOfProgramsRadiosView.toast("Radio deleted")
+                            checkIfProgramHasRadios(programId)
                         },
                         onError = {
 //                            homeView.toast(it.message.toString())
@@ -62,4 +63,30 @@ class ListOfProgramsRadiosPresenter(private val listOfProgramsRadiosModel: ListO
                             listOfProgramsRadiosView.toast("radio was not updated")
                         })
     }
+   private fun checkIfProgramHasRadios(programId: Int){
+        listOfProgramsRadiosModel.countWithProgramId(programId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                        onNext = {
+                                if(it==0){
+                                    deleteProgram(programId)
+                                }
+                        },
+                        onError = {
+                        })
+   }
+
+        private fun deleteProgram(programId: Int){
+            listOfProgramsRadiosModel.deleteProgram(programId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                            onNext = {
+                               listOfProgramsRadiosView.toast("Program deleted")
+                            },
+                            onError = {
+                            })
+
+        }
 }

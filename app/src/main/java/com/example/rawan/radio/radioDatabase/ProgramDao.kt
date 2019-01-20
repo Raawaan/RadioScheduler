@@ -20,6 +20,9 @@ interface ProgramDao{
     @Query("select * from program where programName=:programName" )
     fun selectAllWhereName(programName:String):ProgramEntity
 
+    @Query("select * from program where programId=:programId" )
+    fun selectAllWhereId(programId:Int):ProgramEntity
+
     @Query("SELECT * from program")
     fun selectAll():LiveData<List<ProgramEntity>>
 

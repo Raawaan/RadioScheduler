@@ -76,7 +76,6 @@ class MediaService : BasePlaylistService<MediaItem, PlaylistManager>(), Playlist
 
     override fun onDestroy() {
         super.onDestroy()
-        NotificationUtilities.removeNotification(this)
         Toast.makeText(this,"Media service Stopped", Toast.LENGTH_LONG).show()
         // Releases and clears all the MediaPlayersMediaImageProvider
         playlistManager.mediaPlayers.forEach {
