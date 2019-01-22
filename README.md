@@ -1,9 +1,9 @@
 # Radio
 **Acknowledgements**
 
-Before i begin i would like to present all my love and respect to my team. i would like to thank Engineer/Ahmed Ibrahim Maged for his tolerance and help.
-Also, i would like to say thank you to my trainer Mahmoud Hesham for his guidance.
-Last but not least Ahmed Wahdan and Eslam Hussin for their help and all their information though the whole journey 
+Before i begin i would like to present all my love and respect to my team. i would like to thank Engineer/[Ahmed Ibrahim Maged](https://github.com/ahmedibrahim085) for his tolerance and help.
+Also, i would like to say thank you to my trainer [Mahmoud Hesham](https://github.com/Doodg) for his guidance.
+Last but not least [Ahmed Wahdan](https://github.com/WahdanZ) and [Eslam Hussin](https://github.com/EslamHussein) for their help though the whole journey.
 Finally, i want to show my appreciation for anyone who gave me the opportunity to be part of this experience at orange labs Egypt which was one of a great usefulness to me.
 
 **Project description**
