@@ -89,6 +89,8 @@ class EditProgramActivity : AppCompatActivity(),EditProgramView, LifecycleOwner 
                 startActivity(Intent.createChooser(sendIntent,"Share Program"))
             }
             RVEditProgram.adapter = listOfProgramRadioAdapter
+            //add existed radios in database to two lists, the first listOfExistedRadiosModel which contain static data,
+            //the second listOfExistedAndChosenRadiosModel contain both database radios stations and selected ones, then the compared to add new items to database.
             listOfRadioProgram?.map {
               val radios= RadioProgramFromTo(
                         it.radioName,it.radioImage,it.fromHour,

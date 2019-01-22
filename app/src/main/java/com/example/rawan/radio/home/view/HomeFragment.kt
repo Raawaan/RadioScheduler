@@ -1,21 +1,17 @@
 package com.example.rawan.radio.home.view
 
 import android.arch.lifecycle.*
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.support.annotation.RequiresApi
-import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.*
 import android.widget.Toast
-import com.devbrackets.android.exomedia.ui.widget.VideoControls
+import com.example.rawan.radio.MySharedPreference
 import com.example.rawan.radio.listOfProgramRadios.view.ListOfProgramsRadiosActivity
 import com.example.rawan.radio.R
 import com.example.rawan.radio.editProgram.view.EditProgramActivity
@@ -25,10 +21,7 @@ import com.example.rawan.radio.home.model.ProgramAndRadioProgram
 import com.example.rawan.radio.home.model.ProgramsListAdapter
 import com.example.rawan.radio.home.presenter.RequestAPIPresenter
 import com.example.rawan.radio.radioDatabase.RadioDatabase
-import com.example.rawan.radio.requestRadio.StreamsItem
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
-import com.example.rawan.radio.main.view.MainActivity
 
 
 class HomeFragment : Fragment(),HomeView, LifecycleOwner {
@@ -54,9 +47,14 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner {
         mLifecycleRegistry.markState(Lifecycle.State.RESUMED)
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         RVProgramsList.layoutManager = LinearLayoutManager(this.context)
-        viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
-            viewModelObservable(listOfPrograms)
-        })
+        val order = MySharedPreference.sharedPreference(context).getInt("order",0)
+        if(order==0){
+            toAlphabetical()
+        }
+        else if (order==1){
+            toFavorite()
+        }
+
         val swipeHandler =  object :ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT){
             override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
                 return false
@@ -72,6 +70,17 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner {
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(RVProgramsList)
+    }
+
+    private fun toFavorite() {
+        viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer { listOfPrograms ->
+            viewModelObservable(listOfPrograms)
+        })
+    }
+    private fun toAlphabetical() {
+        viewModel.selectProgramAndRadioProgramByName().observe(this, Observer { listOfPrograms ->
+            viewModelObservable(listOfPrograms)
+        })
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -116,20 +125,18 @@ class HomeFragment : Fragment(),HomeView, LifecycleOwner {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.favorite -> {
-                viewModel.selectProgramAndRadioProgramByFav().observe(this, Observer {listOfPrograms->
-                    viewModelObservable(listOfPrograms)
-                })
-                return true
+                MySharedPreference.editor().putInt("order",1)
+                toFavorite()
+                true
             }
             R.id.alphabetical -> {
-                viewModel.selectProgramAndRadioProgramByName().observe(this, Observer {listOfPrograms->
-                    viewModelObservable(listOfPrograms)
-                })
-                return true
+                MySharedPreference.editor().putInt("order",0)
+                toAlphabetical()
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

@@ -21,7 +21,6 @@ class StopService : JobService(), MainView {
     override fun onStartJob(p0: JobParameters?): Boolean {
         time.setToNow()
         val c = Calendar.getInstance()
-        Toast.makeText(this,"Stream Stopped",Toast.LENGTH_LONG).show()
         mainPresenter= MainPresenter(this, MainModel(RadioDatabase.getInstance(this)))
         mainPresenter.selectNextRadio((time.hour*60000*60+time.minute*60000-6000).toLong(),c.get(Calendar.DAY_OF_WEEK))
         val mediaService = Intent(this,  MediaService::class.java)
@@ -38,7 +37,6 @@ class StopService : JobService(), MainView {
 
     override fun onDestroy() {
         super.onDestroy()
-        Toast.makeText(this,"Stop service Stopped",Toast.LENGTH_LONG).show()
     }
     override fun nextRadio(nextRadio: RadioProgramEntity) {
         val bundle = PersistableBundle()

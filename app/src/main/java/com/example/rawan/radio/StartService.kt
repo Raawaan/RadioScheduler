@@ -51,7 +51,6 @@ class StartService: JobService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Toast.makeText(this,"start service Stopped",Toast.LENGTH_LONG).show()
 
     }
         override fun onStopJob(p0: JobParameters?): Boolean {

@@ -12,8 +12,8 @@ import android.widget.RemoteViews
 
 
 object NotificationUtilities{
-    private val NOTIFICATION_ID = 1138
-    private val NOTIFICATION_CHANNEL_ID = "reminder_notification_channel"
+    private const val NOTIFICATION_ID = 1138
+    private const val NOTIFICATION_CHANNEL_ID = "reminder_notification_channel"
     lateinit var notificationBuilder: NotificationCompat.Builder
     @RequiresApi(Build.VERSION_CODES.O)
     fun notification(context: Context):Notification{
