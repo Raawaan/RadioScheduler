@@ -36,6 +36,7 @@ class MyJobService : JobService(), MainView {
         bundle.putInt("radioId", nextRadio.radioId)
         bundle.putLong("stopService",nextRadio.toHour)
         startRadioPlayService(bundle, nextRadio)
+        sendBroadcast( WidgetNotifier.notify(application,this))
 
     }
     private fun startRadioPlayService(bundle: PersistableBundle, nextRadio: RadioProgramEntity) {

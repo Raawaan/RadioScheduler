@@ -49,10 +49,6 @@ class StartService: JobService() {
 
 //    private val selectedPosition by lazy { intent.extras?.getInt(EXTRA_INDEX, 0) ?: 0 }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-    }
         override fun onStopJob(p0: JobParameters?): Boolean {
 
             return false
