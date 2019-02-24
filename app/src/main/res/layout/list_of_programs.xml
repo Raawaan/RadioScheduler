@@ -31,9 +31,11 @@
         android:id="@+id/favoriteListOfPrograms"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/ic_favorite_border_black_24dp"
+        app:layout_constraintBottom_toTopOf="@+id/ivEditProgram"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

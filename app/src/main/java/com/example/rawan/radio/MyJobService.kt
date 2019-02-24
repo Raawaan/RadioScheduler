@@ -27,7 +27,6 @@ class MyJobService : JobService(), MainView {
         val c = Calendar.getInstance()
         mainPresenter= MainPresenter(this, MainModel(RadioDatabase.getInstance(this)))
         mainPresenter.selectNextRadio((time.hour*60000*60+time.minute*60000-6000).toLong(),c.get(Calendar.DAY_OF_WEEK))
-        NotificationUtilities.notification(this)
         return false
     }
 

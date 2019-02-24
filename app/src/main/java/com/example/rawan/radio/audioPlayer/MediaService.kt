@@ -54,7 +54,6 @@ class MediaService : BasePlaylistService<MediaItem, PlaylistManager>(), Playlist
             amanager = this.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             amanager.setStreamVolume(AudioManager.STREAM_MUSIC,amanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),0)
         }
-//        startForeground(1, NotificationUtilities.notification(this))
 
         view = LayoutInflater.from(this).inflate(R.layout.audio_player_activity,null)
         audioPlayerPresenter= AudioPlayerPresenter(this, AudioPlayerModel(
